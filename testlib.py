@@ -1,12 +1,13 @@
 import sys
 import multiprocessing.dummy as thread
 
-from lib.data import AttribDict
 import logging
 import sys
 from logging.handlers import RotatingFileHandler
 
+
 logger = None
+PrConsole = 1
 
 if not PrConsole:
 
@@ -51,24 +52,3 @@ LOGGER.addHandler(LOGGER_HANDLER)
 LOGGER.setLevel(logging.INFO)
 '''
 
-def scan(num,dest,script):
-
-    vscript = script
-
-    pool = thread.Pool(num)
-    result = pool.map(dest, run)
-
-    pool.close()
-    pool.join()
-
-
-
-
-def run(dest):
-
-    global vscript
-    __import__(vscript)
-
-    result = sys.module[vscript].audit(dest)
-
-    return result
