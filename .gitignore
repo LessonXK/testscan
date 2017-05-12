@@ -1,4 +1,4 @@
 # file
 *.pyc
-tags
-.DS_Store
+# dir
+target/

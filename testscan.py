@@ -156,9 +156,3 @@ if __name__ == '__main__':
             pocScan.start(targets)
     else:
         parser.print_help() 
-    
-
-
-
-
-
