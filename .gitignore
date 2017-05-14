@@ -1,5 +1,6 @@
 # file
 *.pyc
+*.txt
 # dir
 target/
 __pycache__/
