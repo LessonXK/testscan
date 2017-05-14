@@ -21,7 +21,7 @@ class poc(object):
     
     def exploit(self, target):
         
-        headers = {'User-Agent': self.userAgent, 'Content-Type': self.payload}
+        headers = {'User-Agent': self.userAgent}
         try:
             
             res = requests.get(target+self.payload, headers=headers, timeout=30)

