@@ -50,9 +50,14 @@ def queryfile():
     :parma:
     :return:
     """
-    filename = dict()
     pluginmax = 0
     descmax = 0
+    filename = {
+            'WEB': dict(),
+            'CMS': dict(),
+            'FRAME': dict(),
+            'OTHER': dict()
+        }
 
     path = os.path.realpath(os.path.abspath('plugin'))
     if path not in sys.path:
@@ -69,14 +74,26 @@ def queryfile():
                 pluginpath = 'plugin.%s' % pluginname
                 __import__(pluginpath)
                 description = sys.modules[pluginpath].description
+                plugintype = sys.modules[pluginpath].type
             except Exception as err:
                 parser.error('Plugin .py class is error: %s ' % str(err))
                 continue
 
             if len(description) > descmax:
                 descmax = len(description)
+            if plugintype == 'WEB':
+                filename['WEB'][pluginname] = description
+            elif plugintype == 'CMS':
+                filename['CMS'][pluginname] = description
+            elif plugintype == 'FRAME':
+                filename['FRAME'][pluginname] = description
+            elif plugintype == 'OTHER':
+                filename['OTHER'][pluginname] = description
 
-            filename[pluginname] = description
+        if pluginmax < 6:
+            pluginmax = 6
+        if descmax < 11:
+            descmax = 11
 
     return filename, pluginmax, descmax
 
@@ -86,19 +103,20 @@ class ListPlugins(argparse.Action):
     list plugin for .py
     """
     def __call__(self, parsers, namespace, values, option_string=None):
-
+        number = 0
         try:
-            filename, pluginmax, descmax = queryfile()   
+            filename, pluginmax, descmax = queryfile() 
             print('The number of plugins : %d' % len(filename))
-            #list
-            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*(descmax+1)+'+')  
-            print('|id|'+' plugin'+' '*(pluginmax-6)+'|'+' description'+' '*(descmax-11)+'|')
-            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*(descmax+1)+'+')
-            for i,plugin in enumerate(filename.keys()):
-                temp = '|'+' '*(2-len(str(i)))+'%d|'+' %s'+' '*(pluginmax-len(plugin))+'|'+' %s'+' '*(descmax-len(filename[plugin]))+'|'
-                print(temp % (i, plugin, filename[plugin]))
-            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*(descmax+1)+'+')    
-        except Exception as e:
+            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')  
+            print('|id|'+' plugin'+' '*(pluginmax-6)+'| '+'type'+' |'+' description'+' '*(descmax-11)+'|')
+            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')  
+            for plugintype, plugindict in filename.items():
+                for i,plugin in enumerate(sorted(plugindict.keys())):
+                    temp = '|'+' '*(2-len(str(i)))+'%d|'+' %s'+' '*(pluginmax-len(plugin))+'| '+'%s'+' '*(5-len(plugintype))+'|'+' %s'+' '*(descmax-len(plugindict[plugin]))+'|'
+                    print(temp % (number, plugin, plugintype, plugindict[plugin]))
+                    number += 1
+            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')     
+        except IOError as e:
             parsers.error('List Plugins is error: %s ' % str(e))
 
         setattr(namespace, self.dest, True)
@@ -112,8 +130,10 @@ class NumToExploit(argparse.Action):
 
         try:
             exploit = list()
+            tmp = list()
             filename, pluginmax, descmax = queryfile()
-            tmp = filename.keys()
+            for plugintype, plugindict in filename.items():
+                tmp += sorted(plugindict.keys())
             for i in values:
                 exploit.append(tmp[i])
         except Exception as err:

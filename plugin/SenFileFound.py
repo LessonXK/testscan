@@ -11,7 +11,8 @@ import urlparse
 from module.log import logger
 
 description = 'Sensitive Directory/File Scan By dict AUTO'
-type = 'route'
+querytype = 'site'
+type = 'WEB'
 
 class poc(object):
     
@@ -50,11 +51,11 @@ class poc(object):
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'}
         try:
             for path in self.__fileDic(target):
-                r = requests.get(target+path, headers=headers, timeout=10)
-                time.sleep(1)
+                path = path.strip('\r\n')
+                r = requests.head(target+path, headers=headers, timeout=10, allow_redirects=False)
                 if r.ok and r.status_code == 200:
-                    if r.headers.has_key['Content-Type']:
-                        if r.headers['Content-Type'] == 'text/html':
+                    if dict(r.headers).has_key('content-type'):
+                        if 'text/html' in r.headers['Content-Type']:
                             continue
                         else:
                             self.logger.log(41,str([target+path]))

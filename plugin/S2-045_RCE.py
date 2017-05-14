@@ -7,7 +7,8 @@ import sys
 from module.log import logger
 
 description = 'Struts2-045 remote command execute(CVE-2017-5638)'
-type = 'site'
+querytype = 'site'
+type = 'FRAME'
 
 class poc(object):
     

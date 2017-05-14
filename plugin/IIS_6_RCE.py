@@ -8,7 +8,8 @@ import socket
 from module.log import logger
 
 description = 'Windows Server 2003 R2 IIS 6.0 remote command execute'
-type = 'site'
+querytype = 'site'
+type = 'FRAME'
 
 class poc(object):
     

@@ -8,7 +8,8 @@ import requests
 from module.log import logger
 
 description = 'test for file ,not a poc'
-type = 'site'
+querytype = 'site'
+type = 'OTHER'
 
 class poc(object):
     

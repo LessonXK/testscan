@@ -9,7 +9,9 @@ from module.log import logger
 
 
 description = 'Edjoy ECSCMS downfile.aspx download file'
-type = 'site'
+querytype = 'site'
+type = 'CMS'
+cmsname = 'edjoy'
 
 class poc(object):
     

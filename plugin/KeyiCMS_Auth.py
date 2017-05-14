@@ -9,7 +9,8 @@ from module.log import logger
 
 
 description = 'KeyiCMS login in by Cookie whithout auth'
-type = 'site'
+querytype = 'site'
+type = 'CMS'
 cmsname = 'keyicms'
 
 class poc(object):

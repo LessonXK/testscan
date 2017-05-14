@@ -9,8 +9,8 @@ from module.log import logger
 
 
 description = 'Tongda OA SQL Injection'
-type = 'site'
-cmsname = 'tongda'
+querytype = 'site'
+type = 'CMS'
 
 class poc(object):
     
