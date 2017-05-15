@@ -8,9 +8,9 @@ import sys
 import os
 import urlparse
 import argparse
+import config
 from argparse import RawTextHelpFormatter
 from multiprocessing.dummy import Pool
-from module.log import logger
 
 class PocScan(object):
     """
@@ -25,7 +25,7 @@ class PocScan(object):
 
             try:
                 __import__(pluginpath)
-                func = sys.modules[pluginpath].poc(v)
+                func = sys.modules[pluginpath].poc()
                 func.__name__ = plugin
                 self.func.append(func)
             except ImportError as err:
@@ -44,7 +44,7 @@ class PocScan(object):
             pool.close()
             pool.join()
 
-def queryfile():
+def queryfile(status):
     """
     query plugin file
     :parma:
@@ -52,6 +52,7 @@ def queryfile():
     """
     pluginmax = 0
     descmax = 0
+    pluginnums = 0
     filename = {
             'WEB': dict(),
             'CMS': dict(),
@@ -73,10 +74,11 @@ def queryfile():
             try:
                 pluginpath = 'plugin.%s' % pluginname
                 __import__(pluginpath)
-                description = sys.modules[pluginpath].description
-                plugintype = sys.modules[pluginpath].type
+                description = sys.modules[pluginpath].poc.description
+                plugintype = sys.modules[pluginpath].poc.type
+                pluginnums += 1
             except Exception as err:
-                parser.error('Plugin .py class is error: %s ' % str(err))
+                print('Plugin .py class is error: %s ' % str(err))
                 continue
 
             if len(description) > descmax:
@@ -95,7 +97,10 @@ def queryfile():
         if descmax < 11:
             descmax = 11
 
-    return filename, pluginmax, descmax
+    if status:
+        return filename, pluginmax, descmax, pluginnums
+    else:
+        return filename
 
 #list plugin
 class ListPlugins(argparse.Action):
@@ -105,8 +110,8 @@ class ListPlugins(argparse.Action):
     def __call__(self, parsers, namespace, values, option_string=None):
         number = 0
         try:
-            filename, pluginmax, descmax = queryfile() 
-            print('The number of plugins : %d' % len(filename))
+            filename, pluginmax, descmax, pluginnums = queryfile(True) 
+            print('The number of plugins : %d' % pluginnums)
             print('+--+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')  
             print('|id|'+' plugin'+' '*(pluginmax-6)+'| '+'type'+' |'+' description'+' '*(descmax-11)+'|')
             print('+--+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')  
@@ -131,7 +136,7 @@ class NumToExploit(argparse.Action):
         try:
             exploit = list()
             tmp = list()
-            filename, pluginmax, descmax = queryfile()
+            filename = queryfile(False)
             for plugintype, plugindict in filename.items():
                 tmp += sorted(plugindict.keys())
             for i in values:
@@ -155,9 +160,14 @@ def main():
     parser.add_argument('-p', dest='plugin', metavar='name', nargs='+', help='Exploit Plugin By Name')
     parser.add_argument('-n', dest='plugin', metavar='num', type=int, nargs='+',action=NumToExploit, help='Exploit Plugin By Number')
     parser.add_argument('-v', dest='verbose', default=1, type=int, choices=[1,2,3,4], help='verbose level')
+    parser.add_argument('--proxy', dest='proxy', help='http agent')
     parser.add_argument('--exploit', dest='exploit', action='store_true', help='exploit')
 
     p = parser.parse_args()
+
+    config.set_config('verbose', p.verbose)
+    if p.proxy:
+        config.set_config('proxy', {urlparse.urlparse(p.proxy).scheme:urlparse.urlparse(p.proxy).netloc})
 
     if p.list:
         sys.exit(0)

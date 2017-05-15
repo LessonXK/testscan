@@ -10,12 +10,12 @@ import urlparse
 
 from module.log import logger
 
-description = 'Sensitive Directory/File Scan By dict AUTO'
-querytype = 'site'
-type = 'WEB'
-
 class poc(object):
-    
+
+    type = 'WEB'
+    querytype = 'site'
+    description = 'Sensitive Directory/File Scan By dict AUTO'
+
     def __init__(self, v):
     
         self.error404 = None

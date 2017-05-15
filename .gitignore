@@ -1,6 +1,7 @@
 # file
 *.pyc
 *.txt
+plugin/Test.py
 # dir
 target/
 __pycache__/

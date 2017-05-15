@@ -3,35 +3,23 @@
 
 __author__ = 'xiaokong'
 
-import sys
-import requests
-from module.log import logger
+from module.plugin import Plugin
 
-description = 'test for file ,not a poc'
-querytype = 'site'
-type = 'OTHER'
-
-class poc(object):
+class poc(Plugin):
     
+    type = 'OTHER'
+    querytype = 'site'
+    description = 'test for file ,not a poc'
+
     def __init__(self, v):
     
         self.payload = "/Tools/SwfUpload/SwfUploadService.asmx"
         self.userAgent = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'
-        self.logger = logger(v)
     
     def exploit(self, target):
         
-        headers = {'User-Agent': self.userAgent}
-        try:
-            
-            res = requests.get(target+self.payload, headers=headers, timeout=30)
-            if not res.ok:
-                return True
-            data = res.content
-            if '"SwfUploadService.asmx?WSDL"' in data:
-                self.logger.log(41,str([target]))
-        except Exception as e:
-            self.logger.debug(str(e))
+        self.log.vuln('123')
+
     
 
    
