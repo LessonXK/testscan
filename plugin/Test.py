@@ -11,7 +11,7 @@ class poc(Plugin):
     querytype = 'site'
     description = 'test for file ,not a poc'
 
-    def __init__(self, v):
+    def __init__(self):
     
         self.payload = "/Tools/SwfUpload/SwfUploadService.asmx"
         self.userAgent = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'

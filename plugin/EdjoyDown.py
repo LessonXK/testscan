@@ -23,10 +23,3 @@ class poc(Plugin):
             if response.ok:
                 if '<log4net>' in response.content and '<?xml version="1.0" encoding="utf-8" ?>' in response.content:
                     self.log.vuln(target)
-
-    
-
-   
-
-
-

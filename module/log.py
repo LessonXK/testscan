@@ -19,7 +19,7 @@ class colorLoggingHandler(ColorizingStreamHandler):
 
 class logger(object):
 
-    def __init__(self, verbose, module):
+    def __init__(self, verbose, module=None):
         self.module = module
         logging.addLevelName(51, 'VUL')
         self.logger = logging.getLogger('testscan')

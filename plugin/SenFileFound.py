@@ -8,18 +8,15 @@ import time
 import requests
 import urlparse
 
-from module.log import logger
-
 class poc(object):
 
     type = 'WEB'
-    querytype = 'site'
+    querytype = 'route'
     description = 'Sensitive Directory/File Scan By dict AUTO'
 
-    def __init__(self, v):
+    def __init__(self):
     
         self.error404 = None
-        self.logger = logger(v)
     
     def __fileDic(self, target):
         
@@ -38,31 +35,31 @@ class poc(object):
                 dic.append('/'+name+'.zip')
                 dic.append('/'+name+'.7z')
         except IOError as e:
-            self.logger.error(str(e))
+            self.log.error(str(e))
             return None
         except Exception as e:
-            self.logger.error(str(e))
+            self.log.error(str(e))
             return None
 
         return dic
         
     def exploit(self, target):
 
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'}
         try:
             for path in self.__fileDic(target):
                 path = path.strip('\r\n')
-                r = requests.head(target+path, headers=headers, timeout=10, allow_redirects=False)
-                if r.ok and r.status_code == 200:
-                    if dict(r.headers).has_key('content-type'):
-                        if 'text/html' in r.headers['Content-Type']:
-                            continue
+                response = self.query(method='HEAD', url=target+path, allow_redirects=False)
+                if response:
+                    if response.ok and response.status_code == 200:
+                        if dict(response.headers).has_key('content-type'):
+                            if 'text/html' in response.headers['Content-Type']:
+                                continue
+                            else:
+                                self.log.vuln(str([target+path]))
                         else:
-                            self.logger.log(41,str([target+path]))
-                    else:
-                        self.logger.warn(str([target]))
+                            self.logger.warn(str([target]))
         except Exception as e:
-            self.logger.error(str(e))
+            self.log.error(str(e))
             
 
             

