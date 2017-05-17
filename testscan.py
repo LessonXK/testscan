@@ -39,8 +39,7 @@ class PocScan(object):
         :return:
         """
         for func in self.func:
-            print urls
-            print func
+
             pool = Pool(threadnum)
             pool.map(func.exploit, urls)
             pool.close()
@@ -161,7 +160,7 @@ def main():
     parser.add_argument('-f', dest='file', type=argparse.FileType('rt'), help='Targets URL From File')
     parser.add_argument('-p', dest='plugin', metavar='name', nargs='+', help='Exploit Plugin By Name')
     parser.add_argument('-n', dest='plugin', metavar='num', type=int, nargs='+',action=NumToExploit, help='Exploit Plugin By Number')
-    parser.add_argument('-v', dest='verbose', default=1, type=int, choices=[1,2,3,4], help='verbose level')
+    parser.add_argument('-v', dest='verbose', default=2, type=int, choices=[1,2,3,4], help='verbose level')
     parser.add_argument('--proxy', dest='proxy', help='http agent')
     parser.add_argument('--pause', dest='pause', help='http Request interval')
 

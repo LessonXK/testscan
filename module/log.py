@@ -20,21 +20,25 @@ class colorLoggingHandler(ColorizingStreamHandler):
 class logger(object):
 
     def __init__(self, verbose, module=None):
+
         self.module = module
-        logging.addLevelName(51, 'VUL')
         self.logger = logging.getLogger('testscan')
-        try:
-            from logutils.colorize import ColorizingStreamHandler
-            handler = ColorizingStreamHandler(sys.stdout)
-            handler.level_map[logging.getLevelName('VUL')] = (None, 'red', True)
-            handler.level_map[logging.INFO] = (None, 'white', False)
-        except ImportError:
-            handler = logging.StreamHandler(sys.stdout)
-        
-        formatter = logging.Formatter("[%(funcName)s] %(message)s", "%Y-%m-%d %H:%M:%S") 
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-        self.logger.setLevel(verbose*10)
+        #判断是否有handler，避免多次打印
+        if not self.logger.handlers:
+            try:
+                logging.addLevelName(41, 'VUL')
+                from logutils.colorize import ColorizingStreamHandler
+                handler = ColorizingStreamHandler(sys.stdout)
+                handler.level_map[logging.getLevelName('VUL')] = (None, 'red', True)
+                handler.level_map[logging.INFO] = (None, 'white', False)
+                handler.level_map[logging.WARNING] = (None, 'red', True)
+            except ImportError:
+                handler = logging.StreamHandler(sys.stdout)
+                
+            formatter = logging.Formatter("[%(funcName)s] %(message)s", "%Y-%m-%d %H:%M:%S") 
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            self.logger.setLevel(verbose*10)
 
     def debug(self, message):
         self.logger.debug('['+self.module+'] '+message)
@@ -43,10 +47,10 @@ class logger(object):
         self.logger.info('['+self.module+'] '+message)
 
     def error(self, message):
-        self.logger.error('['+self.module+'] '+message)
+        self.logger.warning('['+self.module+'] '+message)
 
     def vuln(self, message):
-        self.logger.log(51, '['+self.module+'] '+message)
+        self.logger.log(41, '['+self.module+'] '+message)
 
         
 
