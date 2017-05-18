@@ -9,6 +9,7 @@ import os
 import urlparse
 import argparse
 import config
+import ipaddr
 from argparse import RawTextHelpFormatter
 from multiprocessing.dummy import Pool
 
@@ -113,15 +114,15 @@ class ListPlugins(argparse.Action):
         try:
             filename, pluginmax, descmax, pluginnums = queryfile(True) 
             print('The number of plugins : %d' % pluginnums)
-            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')  
-            print('|id|'+' plugin'+' '*(pluginmax-6)+'| '+'type'+' |'+' description'+' '*(descmax-11)+'|')
-            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')  
+            print('+---+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')  
+            print('|id |'+' plugin'+' '*(pluginmax-6)+'| '+'type'+' |'+' description'+' '*(descmax-11)+'|')
+            print('+---+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')  
             for plugintype, plugindict in filename.items():
                 for i,plugin in enumerate(sorted(plugindict.keys())):
-                    temp = '|'+' '*(2-len(str(i)))+'%d|'+' %s'+' '*(pluginmax-len(plugin))+'| '+'%s'+' '*(5-len(plugintype))+'|'+' %s'+' '*(descmax-len(plugindict[plugin]))+'|'
+                    temp = '|'+' '*(3-len(str(number)))+'%d|'+' %s'+' '*(pluginmax-len(plugin))+'| '+'%s'+' '*(5-len(plugintype))+'|'+' %s'+' '*(descmax-len(plugindict[plugin]))+'|'
                     print(temp % (number, plugin, plugintype, plugindict[plugin]))
                     number += 1
-            print('+--+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')     
+            print('+---+'+'-'*(pluginmax+1)+'+'+'-'*6+'+'+'-'*(descmax+1)+'+')     
         except IOError as e:
             parsers.error('List Plugins is error: %s ' % str(e))
 
@@ -151,12 +152,12 @@ def main():
 
     parser = argparse.ArgumentParser(prog='testscan',
                                 description ='scan of vul by xiaokong',
-                                usage ='testscan.py [options]',
+                                usage ='testscan.py [options] -u http://www.xxx.com -n 1',
                                 formatter_class=RawTextHelpFormatter
                                 )
     #use script
     parser.add_argument('-l', dest='list',metavar='num/name', nargs='?', action=ListPlugins, help='List Plugins')
-    parser.add_argument('-u', dest='target', help='Target URL')
+    parser.add_argument('-u', dest='target', help='Target URL or IP Address')
     parser.add_argument('-f', dest='file', type=argparse.FileType('rt'), help='Targets URL From File')
     parser.add_argument('-p', dest='plugin', metavar='name', nargs='+', help='Exploit Plugin By Name')
     parser.add_argument('-n', dest='plugin', metavar='num', type=int, nargs='+',action=NumToExploit, help='Exploit Plugin By Number')
@@ -175,11 +176,19 @@ def main():
         sys.exit(0)
 
     elif p.target:
+        try:
+            ips = ipaddr.IPv4Network(p.target).iterhosts()
+            ip_list = [str(x) for x in ips]
+            p.target = ip_list if len(ip_list) else p.target
+        except ipaddr.AddressValueError as e:
+            pass
+            
         if not p.plugin:
             parser.error('please input -n or -p')
         else:
+            p.target = p.target if isinstance(p.target, list) else [p.target]
             pocscan = PocScan(p.plugin)
-            pocscan.start([p.target])
+            pocscan.start(p.target)
     elif p.file:
         targets = list()
         if not p.plugin:

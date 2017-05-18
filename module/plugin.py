@@ -11,7 +11,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 class Plugin(object):
 
-    type = 'CMS/OTHER/FRAME/WEB'
+    type = 'OTHER'
     cmsname = 'Please add the CMS name if CMS type'
     querytype = 'site/route/page'
     description = 'Please complete the description'

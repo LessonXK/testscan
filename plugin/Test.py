@@ -18,7 +18,7 @@ class poc(Plugin):
     
     def exploit(self, target):
         
-        self.log.vuln('123')
+        self.log.vuln(target)
 
     
 

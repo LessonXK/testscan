@@ -52,6 +52,9 @@ class logger(object):
     def vuln(self, message):
         self.logger.log(41, '['+self.module+'] '+message)
 
+    def exception(self, e):
+        self.logger.exception(e)
+
         
 
 

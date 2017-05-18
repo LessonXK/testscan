@@ -3,12 +3,11 @@
 
 __author__ = 'xiaokong'
 
-import sys
-import time
-import requests
 import urlparse
+from module.plugin import Plugin
 
-class poc(object):
+
+class poc(Plugin):
 
     type = 'WEB'
     querytype = 'route'
@@ -57,7 +56,7 @@ class poc(object):
                             else:
                                 self.log.vuln(str([target+path]))
                         else:
-                            self.logger.warn(str([target]))
+                            self.log.debug(str([target]))
         except Exception as e:
             self.log.error(str(e))
             
