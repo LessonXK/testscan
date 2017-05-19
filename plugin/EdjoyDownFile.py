@@ -19,7 +19,7 @@ class poc(Plugin):
     def exploit(self, target):
 
         response = self.query(method='POST', url=target+self.payload)
-        if response:
+        if response is not None:
             if response.ok:
                 if '<log4net>' in response.content and '<?xml version="1.0" encoding="utf-8" ?>' in response.content:
                     self.log.vuln(target)

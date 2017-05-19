@@ -4,6 +4,7 @@
 __author__ = 'xiaokong'
 
 from module.plugin import Plugin
+import time
 
 class poc(Plugin):
     
@@ -18,6 +19,7 @@ class poc(Plugin):
     
     def exploit(self, target):
         
+        #time.sleep(1)
         self.log.vuln(target)
 
     

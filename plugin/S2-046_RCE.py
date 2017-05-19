@@ -27,7 +27,7 @@ class poc(Plugin):
         
             f= {'file':(self.payload, open("data/tmp.txt", 'r'), 'text/plain')}
             response =self.query(method='POST', url=target, files=f)
-            if response:
+            if response is not None:
                 if response.ok:
                     if '13923fd34fcv4200' in response.content and "context.setMemberAccess" not in response.content:
                         self.log.vuln(target)

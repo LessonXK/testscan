@@ -27,7 +27,7 @@ class poc(Plugin):
     def exploit(self, target):
 
         response = self.query(method='GET', url=target)
-        if response:
+        if response is not None:
             if response.ok:
                 r = re.search('<option value=\'.*?\' selected>(.*?)</option>', response.content)
                 if r:

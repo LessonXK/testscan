@@ -21,7 +21,7 @@ class poc(Plugin):
     def exploit(self, target):
         
         response = self.query(method='GET', url=target+self.path, cookie=self.payload)
-        if response:
+        if response is not None:
             if response.ok:
                 if 'location.replace(\'Keyicms_Login.Asp\')' in response.content and 'href="Ky_Admin.Asp"' in response.content:
                     self.log.vuln(target)    

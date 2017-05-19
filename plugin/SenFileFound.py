@@ -48,7 +48,7 @@ class poc(Plugin):
             for path in self.__fileDic(target):
                 path = path.strip('\r\n')
                 response = self.query(method='HEAD', url=target+path, allow_redirects=False)
-                if response:
+                if response is not None:
                     if response.ok and response.status_code == 200:
                         if dict(response.headers).has_key('content-type'):
                             if 'text/html' in response.headers['Content-Type']:

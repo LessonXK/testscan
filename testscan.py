@@ -10,6 +10,7 @@ import urlparse
 import argparse
 import config
 import ipaddr
+import time
 from argparse import RawTextHelpFormatter
 from multiprocessing.dummy import Pool
 
@@ -39,13 +40,25 @@ class PocScan(object):
         :param threadnum: thread number
         :return:
         """
-        for func in self.func:
-
+        s1 = time.time()
+        try:
             pool = Pool(threadnum)
-            pool.map(func.exploit, urls)
-            pool.close()
-            pool.join()
-
+            for func in self.func:
+                result = pool.map_async(func.exploit, urls)#.get(9999999999999999)
+                #pool.map(func.exploit, urls)
+                pool.close()
+               
+                while True:
+                    try:
+                        result.successful()
+                        break
+                    except AssertionError as e:
+                        time.sleep(10)
+                
+        except KeyboardInterrupt as e:
+            print 'scan interrup'
+        
+        print time.time()-s1
 def queryfile(status):
     """
     query plugin file
