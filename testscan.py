@@ -50,7 +50,7 @@ class PocScan(object):
                
                 while True:
                     try:
-                        result.successful()
+                        result.successful() 
                         break
                     except AssertionError as e:
                         time.sleep(10)
@@ -209,7 +209,7 @@ def main():
         else:
             pocscan = PocScan(p.plugin)
             for target in p.file.readlines():
-                targets.append(target.strip('\r\n'))
+                targets.append(target.strip())
             pocscan.start(targets)
     else:
         parser.print_help()

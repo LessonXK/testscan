@@ -4,6 +4,7 @@
 __author__ = 'xiaokong'
 
 from module.plugin import Plugin
+import re
 
 class poc(Plugin):
 

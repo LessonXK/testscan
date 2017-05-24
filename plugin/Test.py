@@ -5,6 +5,10 @@ __author__ = 'xiaokong'
 
 from module.plugin import Plugin
 import time
+import re
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 class poc(Plugin):
     
@@ -19,12 +23,8 @@ class poc(Plugin):
     
     def exploit(self, target):
         
-        #time.sleep(1)
-        self.log.vuln(target)
+        response = self.query(method='GET', url=target)
+        title = re.search('<title>(.*?)</title>', response.content, re.S).group(1).strip()
+        self.log.vuln(title.decode('utf-8')+target.decode('utf-8'))
 
     
-
-   
-
-
-
