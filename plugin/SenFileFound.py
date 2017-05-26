@@ -27,12 +27,10 @@ class poc(Plugin):
             dic.append('/'+netloc+'.rar')
             dic.append('/'+netloc+'.7z')
             dic.append('/'+netloc+'.zip')
-            for name in netloc.split('.'):
-                if '/' in name or 'www'==name or 'com'==name:
-                    continue
-                dic.append('/'+name+'.rar')
-                dic.append('/'+name+'.zip')
-                dic.append('/'+name+'.7z')
+            name = netloc.split('.')[1] 
+            dic.append('/'+name+'.rar')
+            dic.append('/'+name+'.zip')
+            dic.append('/'+name+'.7z')
         except IOError as e:
             self.log.error(str(e))
             return None
@@ -50,13 +48,15 @@ class poc(Plugin):
                 response = self.query(method='HEAD', url=target+path, allow_redirects=False)
                 if response is not None:
                     if response.ok and response.status_code == 200:
-                        if dict(response.headers).has_key('content-type'):
+                        if dict(response.headers).has_key('Content-Type'):                           
                             if 'text/html' in response.headers['Content-Type']:
                                 continue
                             else:
                                 self.log.vuln(str([target+path]))
                         else:
                             self.log.debug(str([target]))
+                else:
+                    break
         except Exception as e:
             self.log.error(str(e))
             
