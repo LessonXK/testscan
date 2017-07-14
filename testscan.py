@@ -164,23 +164,50 @@ class NumToExploit(argparse.Action):
 def main():
 
     parser = argparse.ArgumentParser(prog='testscan',
-                                description ='scan of vul by xiaokong',
-                                usage ='testscan.py [options] -u http://www.xxx.com -n 1',
+                                usage ='testscan.py [options]',
                                 formatter_class=RawTextHelpFormatter
                                 )
+    
+    parser.add_argument('-v', dest='verbose', default=2, type=int, choices=[1,2,3,4], help='verbose level')
+
+    target_group = parser.add_argument_group('target options')
+    target_group.add_argument('-u', dest='target', help='target URL or IP address')
+    target_group.add_argument('-f', dest='file', type=argparse.FileType('rt'), help='targets URL from file')
+    target_group.add_argument('--baidu', dest='baidu', metavar='QUERY', help='baidu search')
+    target_group.add_argument('--google', dest='google', metavar='QUERY', help='google search')
+    target_group.add_argument('--zoomeye', dest='zoomeye', metavar='QUERY', help='zoomeye search')
+
+    spider_group = parser.add_argument_group('spider options')
+    spider_group.add_argument('-c', '--crawl', dest='crawl', action='store_true', help='Whether to start the crawler')
+
+    plugin_group = parser.add_argument_group('plugin options')
+    plugin_group.add_argument('-l', '--list', action='store_true', help='List Plugins')
+    plugin_group.add_argument('-p', dest='plugin', metavar='name', nargs='+', help='Exploit Plugin By Name')
+    plugin_group.add_argument('-n', dest='plugin', metavar='num', type=int, nargs='+',action=NumToExploit, help='Exploit Plugin By Number')
+
+    general_group = parser.add_argument_group('general options')
+    general_group.add_argument('--proxy', dest='proxy', help='http agent')
+    general_group.add_argument('--pause', dest='pause', help='http Request interval')
+    general_group.add_argument('--update', dest='update', action='store_true', help='Update testscan')
+
+    parser.print_help()
     #use script
+    '''
     parser.add_argument('-l', dest='list',metavar='num/name', nargs='?', action=ListPlugins, help='List Plugins')
     parser.add_argument('-u', dest='target', help='Target URL or IP Address')
     parser.add_argument('-f', dest='file', type=argparse.FileType('rt'), help='Targets URL From File')
     parser.add_argument('-p', dest='plugin', metavar='name', nargs='+', help='Exploit Plugin By Name')
     parser.add_argument('-n', dest='plugin', metavar='num', type=int, nargs='+',action=NumToExploit, help='Exploit Plugin By Number')
     parser.add_argument('-v', dest='verbose', default=2, type=int, choices=[1,2,3,4], help='verbose level')
+    parser.add_argument('--baidu', dest='baidu', help='baidu search')
+    parser.add_argument('--google', dest='google', help='google search')
     parser.add_argument('--proxy', dest='proxy', help='http agent')
     parser.add_argument('--pause', dest='pause', help='http Request interval')
 
     p = parser.parse_args()
-
+    
     config.set_config('verbose', p.verbose)
+
     if p.proxy:
         config.set_config('proxy', {urlparse.urlparse(p.proxy).scheme:urlparse.urlparse(p.proxy).netloc})
     if p.pause:
@@ -211,8 +238,9 @@ def main():
             for target in p.file.readlines():
                 targets.append(target.strip())
             pocscan.start(targets)
+    
     else:
         parser.print_help()
-
+    '''
 if __name__ == '__main__':
     main()
